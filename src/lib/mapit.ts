@@ -18,28 +18,27 @@ interface MapItResponse {
   [key: string]: MapItArea;
 }
 
-// Council types that handle rights of way
+// Council types that handle rights of way (in priority order)
 const ROW_AUTHORITY_TYPES = [
   'CTY',  // County Council
   'UTA',  // Unitary Authority
   'MTD',  // Metropolitan District
   'LBO',  // London Borough
   'NPA',  // National Park Authority
+  'DIS',  // District Council
+  'LGD',  // Local Government District (NI)
+  'COI',  // Council (Scotland)
 ];
 
 /**
  * Look up the responsible council for a given location
- * Returns the council that handles rights of way for that area
  */
 export async function lookupCouncil(lat: number, lng: number): Promise<CouncilInfo | null> {
   try {
-    // MapIt expects lng,lat order
     const url = `https://mapit.mysociety.org/point/4326/${lng},${lat}`;
 
     const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: { 'Accept': 'application/json' },
     });
 
     if (!response.ok) {
@@ -49,26 +48,8 @@ export async function lookupCouncil(lat: number, lng: number): Promise<CouncilIn
 
     const data: MapItResponse = await response.json();
 
-    // Find the appropriate authority for rights of way
-    // Priority: County Council > Unitary Authority > Metropolitan District > London Borough > National Park
+    // Find the appropriate authority by priority
     for (const type of ROW_AUTHORITY_TYPES) {
-      for (const area of Object.values(data)) {
-        if (area.type === type) {
-          return {
-            id: area.id,
-            name: area.name,
-            type: area.type,
-            type_name: area.type_name,
-            country: area.country,
-            country_name: area.country_name,
-          };
-        }
-      }
-    }
-
-    // If no specific ROW authority found, return the most local authority
-    const localTypes = ['DIS', 'LGD', 'COI']; // District, Local Government District, Council
-    for (const type of localTypes) {
       for (const area of Object.values(data)) {
         if (area.type === type) {
           return {
@@ -91,47 +72,35 @@ export async function lookupCouncil(lat: number, lng: number): Promise<CouncilIn
 }
 
 /**
- * Get common council email formats
- * Note: These are patterns - actual emails should be verified
+ * Get the contact email for a council from the database
  */
-export function getCouncilEmailPatterns(councilName: string): string[] {
-  const slug = councilName
-    .toLowerCase()
-    .replace(/\s+council$/i, '')
-    .replace(/\s+/g, '')
-    .replace(/[^a-z]/g, '');
+export async function getCouncilEmail(councilName: string): Promise<string | null> {
+  try {
+    const { createClient } = await import('@/lib/supabase/server');
+    const supabase = await createClient();
 
-  return [
-    `prow@${slug}.gov.uk`,
-    `publicrightsofway@${slug}.gov.uk`,
-    `rightsofway@${slug}.gov.uk`,
-    `highways@${slug}.gov.uk`,
-    `countryside@${slug}.gov.uk`,
-    `footpaths@${slug}.gov.uk`,
-  ];
-}
+    // Try exact match first
+    const { data, error } = await supabase
+      .from('council_emails')
+      .select('prow_email')
+      .eq('council_name', councilName)
+      .single();
 
-/**
- * Known council contact emails for rights of way
- * This would ideally be stored in a database and maintained
- */
-const KNOWN_COUNCIL_EMAILS: Record<string, string> = {
-  'Derbyshire County Council': 'prow@derbyshire.gov.uk',
-  'Devon County Council': 'publicrightsofway@devon.gov.uk',
-  'Cornwall Council': 'publicrightsofway@cornwall.gov.uk',
-  'Kent County Council': 'prow@kent.gov.uk',
-  'Hampshire County Council': 'countryside@hants.gov.uk',
-  'Surrey County Council': 'countryside@surreycc.gov.uk',
-  'Peak District National Park Authority': 'customer.service@peakdistrict.gov.uk',
-  'Lake District National Park Authority': 'hq@lakedistrict.gov.uk',
-  'Yorkshire Dales National Park Authority': 'info@yorkshiredales.org.uk',
-  'Snowdonia National Park Authority': 'parc@eryri.llyw.cymru',
-  // Add more as needed
-};
+    if (!error && data) {
+      return data.prow_email;
+    }
 
-/**
- * Get the contact email for a council
- */
-export function getCouncilEmail(councilName: string): string | null {
-  return KNOWN_COUNCIL_EMAILS[councilName] || null;
+    // Try fuzzy match if exact match fails
+    const { data: fuzzyData } = await supabase
+      .from('council_emails')
+      .select('prow_email')
+      .ilike('council_name', `%${councilName}%`)
+      .limit(1)
+      .single();
+
+    return fuzzyData?.prow_email || null;
+  } catch (error) {
+    console.error('Error fetching council email:', error);
+    return null;
+  }
 }

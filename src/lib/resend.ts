@@ -5,6 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 interface SendEmailParams {
   to: string;
   cc?: string;
+  bcc?: string;
   subject: string;
   body: string;
   attachmentUrls?: string[];
@@ -20,7 +21,7 @@ interface SendEmailResult {
  * Send an email via Resend
  */
 export async function sendEmail(params: SendEmailParams): Promise<SendEmailResult> {
-  const { to, cc, subject, body, attachmentUrls } = params;
+  const { to, cc, bcc, subject, body, attachmentUrls } = params;
 
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'footpath-issues@resend.dev';
 
@@ -53,9 +54,14 @@ export async function sendEmail(params: SendEmailParams): Promise<SendEmailResul
       attachments: attachments && attachments.length > 0 ? attachments : undefined,
     };
 
-    // Add CC if provided
+    // Add CC if provided (non-anonymous users)
     if (cc) {
       emailParams.cc = [cc];
+    }
+
+    // Add BCC if provided (anonymous users still get a copy)
+    if (bcc) {
+      emailParams.bcc = [bcc];
     }
 
     const result = await resend.emails.send(emailParams);

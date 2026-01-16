@@ -212,7 +212,7 @@ export function IssueForm() {
             Submit anonymously
           </label>
           <p className="text-sm text-gray-500">
-            Your name and email won&apos;t be included in the report to the council, and you won&apos;t receive a copy of the email.
+            Your name and email won&apos;t be visible to the council. (You&apos;ll still receive a blind copy of the email for your records.)
           </p>
         </div>
       </div>

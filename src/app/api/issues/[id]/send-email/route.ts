@@ -58,8 +58,8 @@ export async function POST(
       );
     }
 
-    // Get council email address
-    const councilEmail = getCouncilEmail(council.name);
+    // Get council email address from database
+    const councilEmail = await getCouncilEmail(council.name);
 
     if (!councilEmail) {
       return NextResponse.json(
@@ -104,9 +104,12 @@ export async function POST(
     const finalBody = body.body || generatedEmail.body;
 
     // Send the email
+    // - Non-anonymous: CC the user (council sees their email)
+    // - Anonymous: BCC the user (they get a copy but council doesn't see their email)
     const emailResult = await sendEmail({
       to: councilEmail,
       cc: !issue.is_anonymous ? userEmail : undefined,
+      bcc: issue.is_anonymous ? userEmail : undefined,
       subject: finalSubject,
       body: finalBody,
       attachmentUrls: photoUrls,
@@ -207,7 +210,7 @@ export async function GET(
       );
     }
 
-    const councilEmail = getCouncilEmail(council.name);
+    const councilEmail = await getCouncilEmail(council.name);
 
     // Get user details
     let userName: string | undefined;
