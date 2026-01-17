@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { lookupCouncil, getCouncilEmail, getCouncilEmailPatterns } from '@/lib/mapit';
+import { lookupCouncil, getCouncilEmail } from '@/lib/mapit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -33,13 +33,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const email = getCouncilEmail(council.name);
-    const emailPatterns = email ? undefined : getCouncilEmailPatterns(council.name);
+    const email = await getCouncilEmail(council.name);
 
     return NextResponse.json({
       council,
       email,
-      emailPatterns,
     });
   } catch (error) {
     console.error('Error looking up council:', error);
