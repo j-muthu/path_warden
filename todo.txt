@@ -1,0 +1,6 @@
+make add an issue button more visible
+also make it still visible even if you're not signed in, it just prompts you to sign in to log an issue
+
+light/dark modes
+
+add home page which is an about page/description, the map page is linked to it
