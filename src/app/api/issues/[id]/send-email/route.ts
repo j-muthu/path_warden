@@ -29,7 +29,7 @@ export async function POST(
         issue_photos (*)
       `)
       .eq('id', id)
-      .single() as { data: Issue & { issue_photos: IssuePhoto[] } | null; error: typeof fetchError };
+      .single() as { data: (Issue & { issue_photos: IssuePhoto[] }) | null; error: unknown };
 
     if (fetchError || !issue) {
       return NextResponse.json({ error: 'Issue not found' }, { status: 404 });
@@ -187,7 +187,7 @@ export async function GET(
         issue_photos (*)
       `)
       .eq('id', id)
-      .single() as { data: Issue & { issue_photos: IssuePhoto[] } | null; error: typeof fetchError };
+      .single() as { data: (Issue & { issue_photos: IssuePhoto[] }) | null; error: unknown };
 
     if (fetchError || !issue) {
       return NextResponse.json({ error: 'Issue not found' }, { status: 404 });
