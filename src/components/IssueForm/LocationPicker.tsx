@@ -39,7 +39,6 @@ export function LocationPicker({
 
     const initMap = async () => {
       const L = await import('leaflet');
-      await import('leaflet/dist/leaflet.css');
 
       // Check if already initialized (safety check)
       if (mapInstanceRef.current) return;

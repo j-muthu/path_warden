@@ -67,7 +67,6 @@ export default function HomePage() {
 
     const initMap = async () => {
       const L = await import('leaflet');
-      await import('leaflet/dist/leaflet.css');
 
       // Check if container is already initialized (safety check)
       if (mapInstanceRef.current) return;

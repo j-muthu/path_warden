@@ -30,7 +30,6 @@ export function OSMap({
 
     const initMap = async () => {
       const L = await import('leaflet');
-      await import('leaflet/dist/leaflet.css');
 
       // Fix for default marker icons
       const DefaultIcon = L.icon({
