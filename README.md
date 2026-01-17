@@ -1,16 +1,36 @@
 # Path Warden
 
-A web application for reporting issues on UK public footpaths, bridleways, and rights of way. Users can report problems like path erosion, overgrowth, damaged signs, and more. The app automatically generates and sends emails to the responsible local authority.
+**Report issues on UK public footpaths and rights of way — and actually get them fixed.**
+
+🌐 **Live at [www.path-warden.com](https://www.path-warden.com)**
+
+---
+
+## The Problem
+
+Found a blocked footpath, overgrown bridleway, or damaged stile? Reporting it to the right council is frustrating:
+- Which council is responsible?
+- What's their email address?
+- How do you describe the location precisely?
+- What should you actually say?
+
+## The Solution
+
+Path Warden handles all of this. Drop a pin on the map, describe the issue, and the app will:
+1. **Identify the responsible council** using your coordinates
+2. **Generate a professional email** citing the Highways Act 1980
+3. **Send it directly** to the council's rights of way team
+4. **Keep you updated** with a copy of the correspondence
 
 ## Features
 
-- **User Authentication**: Sign up and login via Supabase Auth
-- **Issue Reporting**: Submit issues with descriptions, photos, and precise location
-- **Interactive Map**: View all reported issues on an Ordnance Survey map (or OpenStreetMap fallback)
-- **Location Input**: Click on map, enter grid reference, paste coordinates, or use Google Maps link
-- **Automatic Council Detection**: Uses MapIt API to find the responsible local authority
-- **AI-Generated Emails**: OpenAI generates professional emails to councils
-- **Email Delivery**: Resend handles email delivery with optional CC to the reporter
+- **Interactive Map** — Browse all reported issues across the UK on an OpenStreetMap-based interface
+- **Flexible Location Input** — Click the map, enter an OS grid reference, paste coordinates, or drop a Google Maps link
+- **Automatic Council Lookup** — Determines the responsible authority (county council, unitary authority, national park, etc.)
+- **AI-Generated Emails** — Professional, legislation-aware emails generated via OpenAI
+- **Photo Attachments** — Document issues with images that get attached to the council email
+- **Anonymous Option** — Report without revealing your identity to the council
+- **Issue Tracking** — Follow your reports from submission through to resolution
 
 ## Tech Stack
 
@@ -41,13 +61,7 @@ A web application for reporting issues on UK public footpaths, bridleways, and r
 npm install
 ```
 
-2. Copy the environment template:
-
-```bash
-cp .env.local.example .env.local
-```
-
-3. Fill in your environment variables in `.env.local`:
+2. Create a `.env.local` file with your environment variables:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
@@ -98,20 +112,29 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Usage
+## How It Works
 
-1. **Sign up/Login**: Create an account to report issues
-2. **Report an Issue**: Click "Report Issue" and fill in the form
-   - Select issue type
-   - Describe the problem
-   - Set location (click map, enter grid ref, paste coords, or use Maps link)
-   - Upload photos (optional)
-   - Choose anonymous or attributed submission
-3. **Send to Council**: View your issue and click "Send to Council"
-   - Review the AI-generated email
-   - Edit if needed
-   - Send (you'll be CC'd if not anonymous)
-4. **Browse Issues**: View all reported issues on the map
+1. **Create an account** at [www.path-warden.com](https://www.path-warden.com)
+2. **Report an issue** — select the type (erosion, overgrowth, blocked path, etc.), describe it, and set the location
+3. **Add photos** (optional) to document the problem
+4. **Choose attribution** — include your name or report anonymously
+5. **Preview the email** — review the AI-generated message and edit if needed
+6. **Send** — the email goes directly to the council; you get a copy
+
+You can track all your submissions and browse issues reported by others on the map.
+
+## Supported Issue Types
+
+- Path erosion
+- Overgrowth / vegetation
+- Blocked path
+- Damaged or missing signs
+- Flooding / waterlogging
+- Dangerous road crossing
+- Missing waymarks
+- Damaged stiles, gates, or fences
+- Path poorly defined
+- Other
 
 ## Project Structure
 
