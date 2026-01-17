@@ -4,3 +4,5 @@ also make it still visible even if you're not signed in, it just prompts you to 
 light/dark modes
 
 add home page which is an about page/description, the map page is linked to it
+
+add link to me and the github
